@@ -43,8 +43,6 @@ bool Example::add(mini_multi_agent::task_srv::Request &req,
 	else
 		res.status = "executing";
 
-//	res.status = req.A + req.B + req.C;
-//	ROS_INFO("request: A=%d, B=%d C=%d", (int )req.A, (int )req.B, (int )req.C);
 	ROS_INFO("Robot 1 - task id : [%d] comming , status change to [%s]" , req.seq, res.status.c_str());
 	return true;
 }
@@ -84,7 +82,6 @@ void Example::time_callback(const ros::TimerEvent&)
 	}
 
 	mini_multi_agent::rob_status msg;
-//	feedback_msg.header.stamp = ros::Time::now();
 	msg.robot_id = 1;
 	if(stas==0)
 		msg.status = "ready";

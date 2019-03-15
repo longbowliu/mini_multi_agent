@@ -3,13 +3,19 @@
 #include "mini_multi_agent/task_srv.h"
 #include "mini_multi_agent/rob_status.h"
 
+struct ROBOT {
+	int id ;
+	std::string status;
+};
+
+ROBOT rob1 = {1,""};
+ROBOT rob2 = {2,""};
 class TaskDespatcher {
 public:
 	TaskDespatcher();
 	~TaskDespatcher();
 	bool task1_processer(int seq);
 	bool task2_processer(int seq);
-//	bool task2_processer(int seq);
 	void messageCallback(const mini_multi_agent::rob_status::ConstPtr& msg);
 private:
 	ros::NodeHandle nh;
@@ -30,6 +36,11 @@ TaskDespatcher::~TaskDespatcher() {
 
 void TaskDespatcher::messageCallback(
 		const mini_multi_agent::rob_status::ConstPtr& msg) {
+	if(msg->robot_id == 1){
+		rob1.status = msg->status;
+	}else{
+		rob2.status = msg->status;
+	}
 //	ROS_INFO("robot[%d] : [%s]", msg->robot_id, msg->status.c_str());
 }
 
@@ -75,28 +86,22 @@ int main(int argc, char **argv) {
 			if(limit_rob1>1){
 				ROS_INFO("Robot 1 - task id : [%d] DONE !" , limit_rob1-1 );
 			}
-			if(limit_rob1<=5){
+			if(limit_rob1<=5 && rob1.status=="ready"){
 				td.task1_processer(limit_rob1 );
 			}
 			limit_rob1++;
 			count_rob1 = 0;
 		}
-//		if(limit_rob1==6){
-//			ROS_INFO("Robot 1 - task id : [%d] DONE !" , limit_rob1-1 );
-//		}
 		if(count_rob2 >30 && limit_rob2<=6 ){
 			if(limit_rob2>1){
 				ROS_INFO("Robot 2 - task id : [%d] DONE !" , limit_rob2-1 );
 			}
-			if(limit_rob2<=5){
+			if(limit_rob2<=5 && rob2.status=="ready"){
 				td.task2_processer(limit_rob2);
 			}
 			limit_rob2++;
 			count_rob2 = 0;
 		}
-//		if(limit_rob2==6){
-//			ROS_INFO("Robot 2 - task id : [%d] DONE !" , limit_rob2-1 );
-//		}
 		loop_rate.sleep();
 		ros::spinOnce();
 	}
